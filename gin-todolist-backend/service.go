@@ -44,10 +44,8 @@ func editTaskService(c *gin.Context) {
 
 func deleteTaskService(c *gin.Context) {
 	id, errId := strconv.Atoi(c.Param("id"))
-	parentId, errParentId := strconv.Atoi(c.Param("parent_id"))
-
-	if (errId == nil && errParentId == nil) {
-		deleteTask(id, parentId)
+	if (errId == nil) {
+		deleteTask(id)
 	} else {
 		c.AbortWithError(http.StatusNotFound, errId)
 	}

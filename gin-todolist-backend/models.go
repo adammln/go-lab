@@ -34,11 +34,14 @@ func createTask(parentId int, content string) {
 	}
 }
 
-func deleteTask(id int, parentId int) {
-	if parentId != 0 {
-		for _, task := range taskMap {
-			if task.ParentId == id {
-				delete(taskMap, task.ID)
+func deleteTask(id int) {
+	task, isExists := getTaskById(id)
+	if (isExists) {
+		if task.ParentId != 0 {
+			for _, task := range taskMap {
+				if task.ParentId == id {
+					delete(taskMap, task.ID)
+				}
 			}
 		}
 	}
@@ -46,9 +49,11 @@ func deleteTask(id int, parentId int) {
 }
 
 func editTask(id int, newContent string) {
-	var tmpTask Task = taskMap[id]
-	tmpTask.Content = newContent
-	taskMap[id] = tmpTask
+	task, isExists := getTaskById(id)
+	if (isExists) {
+		task.Content = newContent
+		taskMap[id] = task
+	}
 }
 
 func getTaskById(id int) (Task, bool) {
