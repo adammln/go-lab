@@ -17,13 +17,13 @@ func Router() *gin.Engine {
 	router.GET("/", renderAllTasks)
 	
 	// Create task
-	// router.GET("/create", createTask)
+	router.GET("/create/:parent_id/:content", createTaskService)
 
 	// Edit task
-	// router.GET("/edit", createTask)
+	router.GET("/edit/:id/:new_content", editTaskService)
 
 	// Delete task
-	// router.GET("/delete", createTask)
+	router.GET("/delete/:id/:parent_id", deleteTaskService)
 
     return router
 }

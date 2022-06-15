@@ -6,14 +6,14 @@ package main
 type Task struct {
 	ID			int		`json:"taskId"`
 	Content 	string	`json:"content"`
-	ParentId 	int		`json:"parentId"`
+	ParentId 	int		`json:"parentId"` // default: 0, subtask will have ParentId > 0
 	IsChecked 	bool 	`json:"isChecked"`
 }
 
 var taskMap = map[int]Task{
-	1: Task{ID: 1, Content: "Do things 1!", ParentId: -1, IsChecked: false},
+	1: Task{ID: 1, Content: "Do things 1!", ParentId: 0, IsChecked: false},
 	2: Task{ID: 2, Content: "Do things 1.2!", ParentId: 1, IsChecked: false},
-	3: Task{ID: 3, Content: "Do things! 2", ParentId: -1, IsChecked: false},
+	3: Task{ID: 3, Content: "Do things! 2", ParentId: 0, IsChecked: false},
 }
 
 func getAllTasks() []Task {
@@ -22,6 +22,33 @@ func getAllTasks() []Task {
         tasks = append(tasks, val)
     }
 	return tasks
+}
+
+func createTask(parentId int, content string) {
+	var newID int = len(taskMap) + 1
+	taskMap[newID] = Task{
+		ID: newID, 
+		Content: content, 
+		ParentId: parentId, 
+		IsChecked: false,
+	}
+}
+
+func deleteTask(id int, parentId int) {
+	if parentId != 0 {
+		for _, task := range taskMap {
+			if task.ParentId == id {
+				delete(taskMap, task.ID)
+			}
+		}
+	}
+	delete(taskMap, id)
+}
+
+func editTask(id int, newContent string) {
+	var tmpTask Task = taskMap[id]
+	tmpTask.Content = newContent
+	taskMap[id] = tmpTask
 }
 
 func getTaskById(id int) (Task, bool) {
