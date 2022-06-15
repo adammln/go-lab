@@ -1,4 +1,4 @@
-module gin-todolist-app
+module gin-todolist-backend
 
 go 1.18
 
