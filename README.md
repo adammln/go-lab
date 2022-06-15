@@ -1,1 +1,1 @@
-# go-lab
+# Lab for Golang
