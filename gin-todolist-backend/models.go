@@ -2,61 +2,80 @@
 package main
 
 // import "fmt"
+import (
+	"errors"
+	"github.com/google/uuid"
+)
 
 type Task struct {
-	ID			int		`json:"taskId"`
+	ID			string	`json:"taskId"`
 	Content 	string	`json:"content"`
-	ParentId 	int		`json:"parentId"` // default: 0, subtask will have ParentId > 0
+	// ParentId 	uuid	`json:"parentId"` // default: 0, subtask will have ParentId != nil
 	IsChecked 	bool 	`json:"isChecked"`
+	Subtasks	[]Task	`json:"subtasks"`
 }
 
-var taskMap = map[int]Task{
-	1: Task{ID: 1, Content: "Do things 1!", ParentId: 0, IsChecked: false},
-	2: Task{ID: 2, Content: "Do things 1.2!", ParentId: 1, IsChecked: false},
-	3: Task{ID: 3, Content: "Do things! 2", ParentId: 0, IsChecked: false},
+func _generateUuid() string {
+	newUuid := uuid.New()
+	return newUuid.String()
 }
+
+var sampleTask = Task{ID: _generateUuid(), Content: "Do things 1.2!", IsChecked: false, Subtasks: nil}
+
+var tasks = []Task{
+	Task{ID: _generateUuid(), Content: "Do things 1!", IsChecked: false, Subtasks: []Task{sampleTask}},
+	Task{ID: _generateUuid(), Content: "Do things! 2", IsChecked: false, Subtasks: nil},
+}
+
+func _getIndexById(id string) (*int, error) {
+	for i, task := range tasks {
+		if (task.ID == id) {
+			return &i, nil
+		}
+	}
+	return nil, errors.New("Task not found")
+}
+
+func _remove(tasks []Task, index int) []Task {
+	tasks[index] = tasks[len(tasks)-1]
+	return tasks[:len(tasks)-1]
+}
+
 
 func getAllTasks() []Task {
-	tasks := make([]Task, 0, len(taskMap))
-	for _, val := range taskMap {
-        tasks = append(tasks, val)
-    }
 	return tasks
 }
 
-func createTask(parentId int, content string) {
-	var newID int = len(taskMap) + 1
-	taskMap[newID] = Task{
-		ID: newID, 
-		Content: content, 
-		ParentId: parentId, 
+func createTask(content string) {
+	newTask := Task{
+		ID: _generateUuid(), 
+		Content: content,  
 		IsChecked: false,
+		Subtasks: nil,
 	}
+	tasks = append(tasks, newTask)
 }
 
-func deleteTask(id int) {
-	task, isExists := getTaskById(id)
-	if (isExists) {
-		if task.ParentId != 0 {
-			for _, task := range taskMap {
-				if task.ParentId == id {
-					delete(taskMap, task.ID)
-				}
-			}
+func getTaskById(id string) (*Task, error) {
+	for _, task := range tasks {
+		if (task.ID == id) {
+			return &task, nil
 		}
 	}
-	delete(taskMap, id)
+	return nil, errors.New("Task not found")
 }
 
-func editTask(id int, newContent string) {
-	task, isExists := getTaskById(id)
-	if (isExists) {
-		task.Content = newContent
-		taskMap[id] = task
+func deleteTask(id string) {
+	index, err := _getIndexById(id)
+	if (err == nil) {
+		_remove(tasks, *index)
 	}
 }
 
-func getTaskById(id int) (Task, bool) {
-	task, isExists:= taskMap[id]
-	return task, isExists
-}
+// func editTask(id string, newContent string) {
+// 	index := _getIndexById(id)
+// 	if (index != nil) {
+// 		task.Content = newContent
+// 		tasks[index].Content = newContent
+// 	}
+// }
