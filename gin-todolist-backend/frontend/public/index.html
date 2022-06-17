@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link rel="icon" type="image/x-icon" href="/favicon.ico">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link rel="stylesheet" href="scripts/semantic-ui-css/semantic.min.css">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <title>Todolist App</title>
+    </head>
+
+    <body>
+        <div class="ui container">
+            
+            <!-- Application Root -->
+            <div id="wrapper">
+            
+                
+            </div>
+        </div>
+
+        <!-- JS Library Dependencies -->
+        <script src="scripts/jquery/dist/jquery.min.js"></script>
+        <script src="scripts/axios/dist/axios.min.js"></script>
+        <script src="scripts/handlebars/dist/handlebars.min.js"></script>
+        <script src="scripts/vanilla-router/dist/vanilla-router.min.js"></script>
+        <script src="js/app.js"></script>
+
+        <!-- Todo List Template -->
+        <script id="todolist-template" type="text/x-handlebars-template">
+            <h1 class="ui header">My Todo List</h1>
+            <hr>
+            <div class="ui loading basic segment">
+                <ul class="list-group list-group-flush" id="task-list">
+                    {{#each data}}
+                    <!-- <a>{{this.isChecked}}</a> -->
+                    <li class="list-group-item" id="item-parent-task" taskId={{this.taskId}}>
+                        <div class="input-group mb-3">
+                            <div class="input-group-text">
+                                <input class="form-check-input mt-0" type="checkbox" id="check" value="" taskId={{this.taskId}} aria-label="Checkbox for following text input">
+                            </div>
+                            <input type="text" class="form-control" aria-label="Text input with checkbox" id="text-input" taskId={{this.taskId}} value="{{this.content}}">
+                            <button class="btn btn-primary" type="button" id="add-subtask" value="" taskId={{this.taskId}}>⌥</button>
+                            <button class="btn btn-danger" type="button" id="delete" value="" taskId={{this.taskId}}>X</button>
+                        </div>
+                        {{#each this.subtasks}}
+                        <li class="list-group-item" style="margin-left: 36px;" id="item-sub-task" parentId={{../taskId}} taskId={{this.taskId}}>
+                            <div class="input-group mb-3">
+                                <div class="input-group-text">
+                                    <input class="form-check-input mt-0" type="checkbox" id="check-subtask" value="" parentId={{../taskId}} taskId={{this.taskId}} aria-label="Checkbox for following text input">
+                                </div>
+                                <input type="text" class="form-control" aria-label="Text input with checkbox" id="text-input-subtask" parentId={{../taskId}} taskId={{this.taskId}} value="{{this.content}}">
+                                <button class="btn btn-danger" type="button" id="delete-subtask" value="" parentId={{../taskId}} taskId={{this.taskId}}>X</button>
+                            </div>
+                        </li>
+                        {{/each}}
+                    </li>
+                    {{/each}}
+                    <li class="list-group-item" id="item-add-task-button">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary" type="button" id="add-task-button">ADD TASK</button>
+                        </div>
+                    </li>
+
+                  </ul>
+                    
+                </div>
+            </div>
+        </script>
+
+        <!-- Subtask Template -->
+
+
+        <!-- Error Template -->
+        <script id="error-template" type="text/x-handlebars-template">
+            <div class="ui {{color}} inverted segment" style="height:250px;">
+            <br>
+            <h2 class="ui center aligned icon header">
+                <i class="exclamation triangle icon"></i>
+                <div class="content">
+                {{title}}
+                <div class="sub header">{{message}}</div>
+                </div>
+            </h2>
+            </div>
+        </script>
+
+        <script type="text/javascript">
+            $(function() {
+                function clickHandler(event) {
+                    console.log('Button Clicked');
+                }
+
+                $("#add-task-button").click(function(e) { 
+                    console.log(e);         
+                });
+            });
+        </script>
+
+    </body>
+</html>
