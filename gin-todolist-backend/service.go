@@ -26,16 +26,28 @@ func createTaskService(c *gin.Context) {
 	renderAllTasks(c)
 }
 
-// func editTaskService(c *gin.Context) {
-// 	if id, err := strconv.Atoi(c.Param("id")); err == nil {
-// 		editTask(id, c.Param("new_content"))
-// 	} else {
-// 		c.AbortWithError(http.StatusNotFound, err)
-// 	}
-// 	renderAllTasks(c)
-// }
+func editTaskService(c *gin.Context) {
+	editTask(c.Param("id"), c.Param("new_content"))
+	renderAllTasks(c)
+}
 
 func deleteTaskService(c *gin.Context) {
 	deleteTask(c.Param("id"))
+	renderAllTasks(c)
+}
+
+// subtask CRUD
+func createSubtaskService(c *gin.Context) {
+	createSubtask(c.Param("parent_id"), c.Param("content"))
+	renderAllTasks(c)
+}
+
+func editSubtaskService(c *gin.Context) {
+	editSubtask(c.Param("parent_id"), c.Param("subtask_id"), c.Param("new_content"))
+	renderAllTasks(c)
+}
+
+func deleteSubtaskService(c *gin.Context) {
+	deleteSubtask(c.Param("parent_id"), c.Param("subtask_id"))
 	renderAllTasks(c)
 }
