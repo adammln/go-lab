@@ -4,40 +4,34 @@ package main
 import (
   "log"
 	"os"
-	"context"
-	"fmt"
-	"google.golang.org/api/iterator"
+	// "fmt"
+	
+	"github.com/gin-gonic/gin"
+	// "google.golang.org/api/iterator"
 
   firebase "firebase.google.com/go"
   "google.golang.org/api/option"
+	firestore "cloud.google.com/go/firestore"
 )
 
-// Use a service account
-
-func dbGetAllTasks() {
-	ctx := context.Background()
+func _initFirebaseApp(c *gin.Context) (*firebase.App, error) {
 	sa := option.WithCredentialsFile(os.Getenv("RELATIVE_PATH_GCP_KEYFILE"))
-	app, err := firebase.NewApp(ctx, nil, sa)
-	if err != nil {
+	app, err := firebase.NewApp(c, nil, sa)
+	if (err != nil) {
 		log.Fatalln(err)
+		return nil, err
 	}
-	
-	log.Print("INITIATING DB CONNECTION...")
-	client, err := app.Firestore(ctx)
-	log.Print(client)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	iter := client.Collection("todolist-app").Documents(ctx)
-	for {
-		doc, err := iter.Next()
-		if err == iterator.Done {
-						break
-		}
-		if err != nil {
-						log.Fatalf("Failed to iterate: %v", err)
-		}
-		fmt.Println(doc.Data())
-	}
+	return app, err
 }
+
+func _initFirestoreClient(c *gin.Context, app *firebase.App) (*firestore.Client, error) {
+	client, err := app.Firestore(c)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return client, err
+}
+
+// func dbGetAllTasks(context *gin.Context) []Task{
+	
+// }
