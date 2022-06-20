@@ -1,22 +1,17 @@
 // models.task.go
 package main
 
-// import "fmt"
 import (
 	"errors"
-	"github.com/google/uuid"
 )
 
 type Task struct {
-	ID			string	`json:"taskId"`
-	Content 	string	`json:"content"`
-	IsChecked 	bool 	`json:"isChecked"`
-	Subtasks	[]Task	`json:"subtasks"`
-}
-
-func _generateUuid() string {
-	newUuid := uuid.New()
-	return newUuid.String()
+	ID				string		`json:"taskId"`
+	ParentID	string		`json:"parentId"`
+	RankOrder	int				`json:"rankOrder"`
+	Content 	string		`json:"content"`
+	IsChecked bool 			`json:"isChecked"`
+	Subtasks	[]string	`json:"subtasks"`
 }
 
 var st1 = Task{ID: _generateUuid(), Content: "Do things 1.1!", IsChecked: false, Subtasks: nil}

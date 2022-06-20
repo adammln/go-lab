@@ -14,6 +14,11 @@ import (
 	firestore "cloud.google.com/go/firestore"
 )
 
+func _generateUuid() string {
+	newUuid := uuid.New()
+	return newUuid.String()
+}
+
 func _initFirebaseApp(c *gin.Context) (*firebase.App, error) {
 	sa := option.WithCredentialsFile(os.Getenv("RELATIVE_PATH_GCP_KEYFILE"))
 	app, err := firebase.NewApp(c, nil, sa)
