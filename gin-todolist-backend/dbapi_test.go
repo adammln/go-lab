@@ -28,16 +28,16 @@ func _getDummyTasks() map[string]Task {
 	**/
 	
 	// # generate default value
-	var tasks map[string]Task
+	var tasks = make(map[string]Task)
 	for i := 1; i <= 10; i++ {
 		tmpID := fmt.Sprintf("task_id_%d", i)
 		tmpTask := Task{
 			ID: tmpID,
-			ParentID: nil,
+			ParentID: "",
 			RankOrder: i,
 			Content: fmt.Sprintf("original content for task_id_%d", i),
 			IsChecked: false,
-			Subtasks: nil,
+			Subtasks: nil,	
 		}
 		tasks[tmpID] = tmpTask
 	}
@@ -46,25 +46,32 @@ func _getDummyTasks() map[string]Task {
 	// parent	: subtasks
 	// 1			: 2,3,4
 	subtasks_1 := []string{"task_id_2", "task_id_3", "task_id_4"}
-	tasks["task_id_1"].Subtasks = subtasks_1
+	tmpTask_1 := tasks["task_id_1"]
+	tmpTask_1.Subtasks = subtasks_1
+	tasks["task_id_1"] = tmpTask_1
 	for i, subtaskId := range subtasks_1 {
-		tasks[subtaskId].ParentID = "task_id_1"
-		tasks[subtaskId].RankOrder = i+1
-		fmt.Println(i)
+		tmpSubtask := tasks[subtaskId]
+		tmpSubtask.ParentID = "task_id_1"
+		tmpSubtask.RankOrder = i+1
+		tasks[subtaskId] = tmpSubtask
 	}
 
+	// parent	: subtasks
 	// 5			: 6,7
 	subtasks_5 := []string{"task_id_6", "task_id_7"}
-	tasks["task_id_5"].Subtasks = subtasks_5
-	for i, subtaskId := range subtasks_1 {
-		tasks[subtaskId].ParentID = "task_id_5"
-		tasks[subtaskId].RankOrder = i+1
-		fmt.Println(i)
+	tmpTask_5 := tasks["task_id_5"]
+	tmpTask_5.Subtasks = subtasks_5
+	tasks["task_id_1"] = tmpTask_5
+	for i, subtaskId := range subtasks_5 {
+		tmpSubtask := tasks[subtaskId]
+		tmpSubtask.ParentID =  "task_id_5"
+		tmpSubtask.RankOrder = i+1
+		tasks[subtaskId] = tmpSubtask
 	}
 	return tasks
 }
 
-func TestFirebaseConnectionSuccess(t *testing.T) {
+func TestFirebaseConnection(t *testing.T) {
 	c := _getTestContext()
 	// test firebase app initialization 
 	app, errFirebase := _initFirebaseApp(c)
@@ -80,23 +87,55 @@ func TestFirebaseConnectionSuccess(t *testing.T) {
 	client.Close()
 }
 
-
-func TestGetAllTasks(t *testing.T) {
+func TestFirebaseConnectionWrapper(t *testing.T) {
 	c := _getTestContext()
-	collection_id := os.Getenv("FIRESTORE_TEST_DATA_COLLECTION_ID")
 
-	WANTED_TASKS_LENGTH := 10
-
-	data := dbGetAllTasks(c)
-
-	// check sample data != nil
-	if (data == nil) {
-		t.Fatal("data query = NULL, want []Task")
+	// test Firebase (Firestore) connection wrapper 
+	db := _initDbConnection(c)
+	if db == nil {
+		t.Fatal("DB Error: db client is nil")
 	}
-
-	// TODO: check if length of data as we wanted
-
-	// TODO: check if ordering is correct
-
-	// TODO: check if all attributes are available
+	db.Close()
 }
+
+func TestCreateNewTasks(t *testing.T) {
+	c := _getTestContext()
+	collectionID := os.Getenv("FIRESTORE_TEST_DATA_COLLECTION_ID")
+	tasks := _getDummyTasks()
+	for _, task_id := range []string{
+		"task_id_1", "task_id_5", "task_id_6", 
+		"task_id_7", "task_id_8", "task_id_9",
+		"task_id_10",
+	} {
+		task := tasks[task_id]
+		_, err := dbCreateTask(
+			c,
+			task.Content,
+			task.RankOrder,
+			collectionID,
+		)
+		if (err != nil) {
+			t.Fatal(err)
+		}
+	}
+}
+
+// func TestGetAllTasks(t *testing.T) {
+// 	c := _getTestContext()
+// 	collection_id := os.Getenv("FIRESTORE_TEST_DATA_COLLECTION_ID")
+
+// 	WANTED_TASKS_LENGTH := 10
+
+// 	data := dbGetAllTasks(c)
+
+// 	// check sample data != nil
+// 	if (data == nil) {
+// 		t.Fatal("data query = NULL, want []Task")
+// 	}
+
+// 	// TODO: check if length of data as we wanted
+
+// 	// TODO: check if ordering is correct
+
+// 	// TODO: check if all attributes are available
+// }
