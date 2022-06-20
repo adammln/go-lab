@@ -2,16 +2,16 @@
 package main
 
 import (
-  "log"
+	"log"
 	"os"
-	
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	// "google.golang.org/api/iterator"
+	"google.golang.org/api/iterator"
 
-  firebase "firebase.google.com/go"
-  "google.golang.org/api/option"
 	firestore "cloud.google.com/go/firestore"
+	firebase "firebase.google.com/go"
+	"google.golang.org/api/option"
 )
 
 func _generateUuid() string {
@@ -22,12 +22,12 @@ func _generateUuid() string {
 func _generateNewTask(content string, parentID string, rankOrder int) Task {
 	tmpID := _generateUuid()
 	newTask := Task{
-		ID: tmpID,
-		ParentID: parentID,
+		ID:        tmpID,
+		ParentID:  parentID,
 		RankOrder: rankOrder,
-		Content: content,
+		Content:   content,
 		IsChecked: false,
-		Subtasks: nil,
+		Subtasks:  nil,
 	}
 	return newTask
 }
@@ -35,7 +35,7 @@ func _generateNewTask(content string, parentID string, rankOrder int) Task {
 func _initFirebaseApp(c *gin.Context) (*firebase.App, error) {
 	sa := option.WithCredentialsFile(os.Getenv("RELATIVE_PATH_GCP_KEYFILE"))
 	app, err := firebase.NewApp(c, nil, sa)
-	if (err != nil) {
+	if err != nil {
 		log.Fatalln(err)
 		return nil, err
 	}
@@ -46,11 +46,12 @@ func _initFirestoreClient(c *gin.Context, app *firebase.App) (*firestore.Client,
 	db, err := app.Firestore(c)
 	if err != nil {
 		log.Fatalln(err)
+		return nil, err
 	}
-	return db, err
+	return db, nil
 }
 
-func _initDbConnection(c * gin.Context) *firestore.Client {
+func _initDbConnection(c *gin.Context) *firestore.Client {
 	app, _ := _initFirebaseApp(c)
 	db, _ := _initFirestoreClient(c, app)
 	return db
@@ -64,9 +65,46 @@ func dbCreateTask(c *gin.Context, content string, rankOrder int, collectionID st
 		log.Fatalf(`Database Error: Can't Create Task Document with content "%s"`, content)
 		return nil, err
 	}
-	return wr, nil 
+	db.Close()
+	return wr, nil
 }
 
-// func dbGetAllTasks(context *gin.Context) []Task{
-	
-// }
+func dbGetAllTasks(c *gin.Context, collectionID string) (*TaskWrapper, error) {
+	db := _initDbConnection(c)
+
+	var tasksData = make(map[string]Task)
+	var orders []string
+	collection := db.Collection(collectionID)
+	iter := collection.OrderBy("RankOrder", firestore.Asc).Documents(c)
+	counter := 0
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			log.Printf(`[INFO] dbapi.GetAllTasks: Queried %d document(s)`, counter)
+			break
+		}
+
+		if err != nil {
+			log.Fatalln(err)
+			return nil, err
+		}
+
+		var task Task
+		if err := doc.DataTo(&task); err != nil {
+			log.Fatalf(`Error while converting query data to Task model for doc ID: %s. %v`, doc.Ref.ID, err)
+			return nil, err
+		}
+
+		// append tasksData
+		tasksData[doc.Ref.ID] = task
+		// append orders
+		if task.ParentID == "" {
+			orders = append(orders, doc.Ref.ID)
+		}
+		counter++
+	}
+	db.Close()
+	// create taskwrapper
+	taskWrapper := TaskWrapper{Data: tasksData, Orders: orders}
+	return &taskWrapper, nil
+}

@@ -11,6 +11,11 @@ type Task struct {
 	Subtasks	[]string	`json:"subtasks"`
 }
 
+type TaskWrapper struct {
+	Data		map[string]Task	`json: "data"`
+	Orders	[]string				`json: "orders"`
+}
+
 // var st1 = Task{ID: _generateUuid(), Content: "Do things 1.1!", IsChecked: false, Subtasks: nil}
 // var st2 = Task{ID: _generateUuid(), Content: "Do things 1.2!", IsChecked: false, Subtasks: nil}
 // var st3 = Task{ID: _generateUuid(), Content: "Do things 1.3!", IsChecked: false, Subtasks: nil}
