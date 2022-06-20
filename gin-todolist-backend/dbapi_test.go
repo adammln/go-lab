@@ -6,6 +6,7 @@ import (
 	"testing"
 	"fmt"
 	"os"
+	"reflect"
 
 	"github.com/gin-gonic/gin"
 )
@@ -117,6 +118,76 @@ func TestCreateNewTasks(t *testing.T) {
 		if (err != nil) {
 			t.Fatal(err)
 		}
+	}
+}
+
+func TestGetAllTasks(t *testing.T) {
+	c := _getTestContext()
+	collection_id := os.Getenv("FIRESTORE_TEST_DATA_COLLECTION_ID")
+
+	tasksWrapper := dbGetAllTasks(c)
+
+	// # TEST datatype is correct: 
+	// - tasksWrapper == TasksWrapper
+	tTaskWrapper := reflect.TypeOf(taskWrapper)
+	if (tTaskWrapper != reflect.TypeOf(TaskWrapper)) {
+		t.Fatalf(`TypeError: Type of taskWrapper = %s, want %s`, tTaskWrapper, reflect.TypeOf(TaskWrapper))
+	}
+
+	// - tasksWrapper.Data -> == map[string]Task
+	tTaskWrapperData := reflect.TypeOf(taskWrapper.Data)
+	if (tTaskWrapperData != reflect.TypeOf(map[string]Task)) {
+		t.Fatalf(`TypeError: Type of taskWrapper.Data = %s, want %s`, tTaskWrapper, reflect.TypeOf(map[string]Task))
+	}
+
+	// - tasksWrapper.Orders -> == []string
+	tTaskWrapperOrders := reflect.TypeOf(taskWrapper.Orders)
+	if (tTaskWrapperOrders != reflect.TypeOf([]string)) {
+		t.Fatalf(`TypeError: Type of taskWrapper.Data = %s, want %s`, tTaskWrapperOrders, reflect.TypeOf([]string))
+	}
+	
+	// # TEST query result as wanted
+	// - specify wanted length results:
+	wantedTasksLength := 5
+	actualTasksLengthData := len(tasksWrapper.Data)
+	actualTasksLengthOrders := len(tasksWrapper.Orders)
+	
+	// - check tasksWrapper.Data == 5
+	if actualTasksLengthData != WANTED_TASKS_LENGTH {
+		t.Fatalf(
+			`Result Length of dbGetAllTasks()=>tasksWrapper.Data = %d, want %d, error`, 
+			actualTasksLengthData, 
+			wantedTasksLength,
+		)
+	}
+
+	// - check tasksWrapper.Orders == 5
+	if actualTasksLengthOrders != WANTED_TASKS_LENGTH {
+		t.Fatalf(
+			`Result Length of dbGetAllTasks()=>tasksWrapper.Orders = %d, want %d, error`, 
+			actualTasksLengthOrders, 
+			wantedTasksLength,
+		)
+	}
+
+	// Iteration check
+	i := 0
+	for docId, task := range tasksWrapper.Data {
+		// # TEST ordering is correct: [1-5]
+		if task.RankOrder != i+1 {
+			t.Fatalf(`Ordering error: ordering for task "%s" = %d, want %d`, task.Content, task.RankOrder, i+1)
+		}
+
+		// # TEST default attr ID: wanted not "" (empty string)
+		if task.ID == "" {
+			t.Fatalf(`Default value of the attribute 'ID' for task "%s" = "", want %s`, task.Content, task.RankOrder, docId)
+		}
+
+		// # TEST default attr IsChecked: wanted false
+		if task.IsChecked {
+			t.Fatalf(`Default value of the attribute 'IsChecked' for task "%s" = %t, want false`, task.Content, task.IsChecked)
+		}
+		i++
 	}
 }
 
