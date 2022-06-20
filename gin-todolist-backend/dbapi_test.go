@@ -18,22 +18,6 @@ func _getTestContext() *gin.Context {
 	return c
 }
 
-func TestFirebaseConnectionSuccess(t *testing.T) {
-	c := _getTestContext()
-	// test firebase app initialization 
-	app, errFirebase := _initFirebaseApp(c)
-	if (errFirebase != nil) {
-		t.Fatal(errFirebase)
-	}
-
-	// test firestore client connection
-	client, errFirestore := _initFirestoreClient(c, app)
-	if (errFirestore != nil) {
-		t.Fatal(errFirestore)
-	}
-	client.Close()
-}
-
 func _getDummyTasks() map[string]Task {
 	/** Helper: Generate 10 dummy tasks
 	- 5 Parent Task (ParentID=nil) 
@@ -47,7 +31,7 @@ func _getDummyTasks() map[string]Task {
 	var tasks map[string]Task
 	for i := 1; i <= 10; i++ {
 		tmpID := fmt.Sprintf("task_id_%d", i)
-    tmpTask := Task{
+		tmpTask := Task{
 			ID: tmpID,
 			ParentID: nil,
 			RankOrder: i,
@@ -79,6 +63,23 @@ func _getDummyTasks() map[string]Task {
 	}
 	return tasks
 }
+
+func TestFirebaseConnectionSuccess(t *testing.T) {
+	c := _getTestContext()
+	// test firebase app initialization 
+	app, errFirebase := _initFirebaseApp(c)
+	if (errFirebase != nil) {
+		t.Fatal(errFirebase)
+	}
+
+	// test firestore client connection
+	client, errFirestore := _initFirestoreClient(c, app)
+	if (errFirestore != nil) {
+		t.Fatal(errFirestore)
+	}
+	client.Close()
+}
+
 
 func TestGetAllTasks(t *testing.T) {
 	c := _getTestContext()
