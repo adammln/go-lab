@@ -29,6 +29,7 @@ func _generateNewTask(content string, parentID string, rankOrder int) Task {
 		IsChecked: false,
 		Subtasks:  nil,
 	}
+	log.Printf(`[INFO] _generateNewTask: Created task payload--"%s"`, content)
 	return newTask
 }
 
@@ -62,7 +63,8 @@ func dbCreateTask(c *gin.Context, content string, rankOrder int, collectionID st
 	newTask := _generateNewTask(content, "", rankOrder)
 	wr, err := db.Collection(collectionID).Doc(newTask.ID).Set(c, newTask)
 	if err != nil {
-		log.Fatalf(`Database Error: Can't Create Task Document with content "%s"`, content)
+		log.Fatalf(`[Error] dbapi.dbGetAllTasks: Can't Create Task Document with content "%s". %s`, content, err)
+		db.Close()
 		return nil, err
 	}
 	db.Close()
@@ -86,12 +88,14 @@ func dbGetAllTasks(c *gin.Context, collectionID string) (*TaskWrapper, error) {
 
 		if err != nil {
 			log.Fatalln(err)
+			db.Close()
 			return nil, err
 		}
 
 		var task Task
 		if err := doc.DataTo(&task); err != nil {
-			log.Fatalf(`Error while converting query data to Task model for doc ID: %s. %v`, doc.Ref.ID, err)
+			log.Fatalf(`[Error] dbapi.dbGetAllTasks: Error while converting query data to Task model for doc ID: %s. %v`, doc.Ref.ID, err)
+			db.Close()
 			return nil, err
 		}
 

@@ -118,7 +118,7 @@ func TestCreateNewTasks(t *testing.T) {
 			collectionID,
 		)
 		if err != nil {
-			t.Fatal(err)
+			t.Fatalf(`[Error] TestCreateNewTasks: Failed at creating task-%d of %d. Reason: %s`, i, 5, err)
 		}
 	}
 }
