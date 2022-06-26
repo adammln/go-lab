@@ -1,3 +1,7 @@
+# install required package
+sudo apt-get update
+sudo apt-get install build-essential -y
+
 # create download dir if not exists
 mkdir $HOME/Downloads
 cd $HOME/Downloads
