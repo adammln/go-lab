@@ -183,11 +183,11 @@ func TestGetAllTasks(t *testing.T) {
 	i := 0
 	// errorMarker := false
 	for docID, task := range taskWrapper.Data {
-		// # TEST ordering is correct: [1-5]
-		if task.RankOrder != i+1 {
-			t.Fatalf(`[ERROR] dbapi_test.TestGetAllTasks: Ordering for task "%s" = %d, want %d`, task.Content, task.RankOrder, i+1)
-			// errorMarker = true
-		}
+		// // # TEST ordering is correct: [1-5]
+		// if task.RankOrder != i+1 {
+		// 	t.Fatalf(`[ERROR] dbapi_test.TestGetAllTasks: Ordering for task "%s" = %d, want %d`, task.Content, task.RankOrder, i+1)
+		// 	// errorMarker = true
+		// }
 
 		// # TEST default attr ID: wanted not "" (empty string)
 		if task.ID == "" || task.ID != docID {
@@ -207,7 +207,7 @@ func TestGetAllTasks(t *testing.T) {
 		// # TEST ordering is correct: [1-5]
 		task := taskWrapper.Data[docID]
 		if task.RankOrder != i+1 {
-			t.Fatalf(`[ERROR] dbapi_test.TestGetAllTasks: ordering for task "%s" = %d, want %d`, task.Content, task.RankOrder, i+1)
+			t.Fatalf(`[ERROR] dbapi_test.TestGetAllTasks-Parent: ordering for task "%s" = %d, want %d`, task.Content, task.RankOrder, i+1)
 		}
 	}
 }
