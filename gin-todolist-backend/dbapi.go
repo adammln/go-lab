@@ -29,7 +29,6 @@ func _generateNewTask(content string, parentID string, rankOrder int) Task {
 		IsChecked: false,
 		Subtasks:  nil,
 	}
-	log.Printf(`[INFO] _generateNewTask: Created task payload--"%s"`, content)
 	return newTask
 }
 
