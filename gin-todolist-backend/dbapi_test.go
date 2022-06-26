@@ -183,12 +183,6 @@ func TestGetAllTasks(t *testing.T) {
 	i := 0
 	// errorMarker := false
 	for docID, task := range taskWrapper.Data {
-		// // # TEST ordering is correct: [1-5]
-		// if task.RankOrder != i+1 {
-		// 	t.Fatalf(`[ERROR] dbapi_test.TestGetAllTasks: Ordering for task "%s" = %d, want %d`, task.Content, task.RankOrder, i+1)
-		// 	// errorMarker = true
-		// }
-
 		// # TEST default attr ID: wanted not "" (empty string)
 		if task.ID == "" || task.ID != docID {
 			t.Fatalf(`[ERROR] dbapi_test.TestGetAllTasks: Default value of the attribute 'ID' for task "%s" = %s, want %s`, task.Content, task.ID, docID)
