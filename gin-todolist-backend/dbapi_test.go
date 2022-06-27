@@ -102,6 +102,59 @@ func TestFirebaseConnectionWrapper(t *testing.T) {
 	db.Close()
 }
 
+// TODO: Create test for empty task list
+func TestGetAllTasksIsEmpty(t *testing.T) {
+	c := _getTestContext()
+	collectionID := os.Getenv("FIRESTORE_TEST_DATA_COLLECTION_ID")
+	taskWrapper, err := dbGetAllTasks(c, collectionID)
+
+	// # TEST err
+	if err != nil {
+		t.Fatalf(`[ERROR] dbapi_test.TestGetAllTasks: Fail at getting all tasks. %v`, err)
+	}
+
+	// # TEST datatype is correct:
+	// - taskWrapper == TaskWrapper
+	var tw TaskWrapper
+	if reflect.TypeOf(*taskWrapper) != reflect.TypeOf(tw) {
+		t.Fatalf(`[ERROR] dbapi_test.TestGetAllTasks: Type of taskWrapper = %s, want %s`, reflect.TypeOf(*taskWrapper), reflect.TypeOf(tw))
+	}
+
+	// - taskWrapper.Data -> == map[string]Task
+	var mpTask map[string]Task
+	if reflect.TypeOf(taskWrapper.Data) != reflect.TypeOf(mpTask) {
+		t.Fatalf(`[ERROR] dbapi_test.TestGetAllTasks: Type of taskWrapper.Data = %s, want %s`, reflect.TypeOf(taskWrapper.Data), reflect.TypeOf(mpTask))
+	}
+
+	// - taskWrapper.Orders -> == []string
+	var lstr []string
+	if reflect.TypeOf(taskWrapper.Orders) != reflect.TypeOf(lstr) {
+		t.Fatalf(`[ERROR] dbapi_test.TestGetAllTasks: Type of taskWrapper.Data = %s, want %s`, reflect.TypeOf(taskWrapper.Orders), reflect.TypeOf(lstr))
+	}
+
+	wantedTasksLengthOrder := 0
+	actualTasksLengthOrders := len(taskWrapper.Orders)
+	// - check len(taskWrapper.Orders) == 0
+	if actualTasksLengthOrders != wantedTasksLengthOrder {
+		t.Fatalf(
+			`[ERROR] dbapi_test.TestGetAllTasks: Result Length of dbGetAllTasks()=>taskWrapper.Orders = %d, want %d.`,
+			actualTasksLengthOrders,
+			wantedTasksLengthOrder,
+		)
+	}
+
+	wantedTasksLengthData := 0
+	actualTasksLengthData := len(taskWrapper.Data)
+	// - check len(taskWrapper.Data) == 0
+	if actualTasksLengthData != wantedTasksLengthData {
+		t.Fatalf(
+			`[ERROR] dbapi_test.TestGetAllTasks: Result Length of dbGetAllTasks()=>taskWrapper.Data = %d, want %d.`,
+			actualTasksLengthData,
+			wantedTasksLengthData,
+		)
+	}
+}
+
 func TestCreateNewTasks(t *testing.T) {
 	c := _getTestContext()
 	collectionID := os.Getenv("FIRESTORE_TEST_DATA_COLLECTION_ID")
@@ -245,5 +298,3 @@ func Test__DeleteTestingCollection(t *testing.T) {
 	}
 	db.Close()
 }
-
-// TODO: Create test for empty task list
