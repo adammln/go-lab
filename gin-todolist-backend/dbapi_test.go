@@ -153,21 +153,6 @@ func TestGetAllTasks(t *testing.T) {
 		t.Fatalf(`[ERROR] dbapi_test.TestGetAllTasks: Type of taskWrapper.Data = %s, want %s`, reflect.TypeOf(taskWrapper.Orders), reflect.TypeOf(lstr))
 	}
 
-	// # TEST query result as wanted
-	// - specify wanted length results:
-	// actualTasksLengthData := len(taskWrapper.Data)
-
-	// wantedTasksLengthData := 10
-	// actualTasksLengthData := len(taskWrapper.Data)
-	// // - check taskWrapper.Data == 5 (aborted, because Data includes subtasks)
-	// if actualTasksLengthData != wantedTasksLengthData {
-	// 	t.Fatalf(
-	// 		`Result Length of dbGetAllTasks()=>taskWrapper.Data = %d, want %d, error`,
-	// 		actualTasksLengthData,
-	// 		wantedTasksLengthData,
-	// 	)
-	// }
-
 	wantedTasksLengthOrder := 5
 	actualTasksLengthOrders := len(taskWrapper.Orders)
 	// - check len(taskWrapper.Orders) == 5
@@ -247,16 +232,16 @@ func _deleteCollection(ctx *gin.Context, client *firestore.Client,
 }
 
 // =================== DANGER ZONE ========================
-// make sure target collectionID is correct!
+// make sure target collectionID is correct! ==> FIRESTORE_TEST_DATA_COLLECTION_ID
 func Test__DeleteTestingCollection(t *testing.T) {
 	log.Println("[INFO] dbapi_test._DeleteTestingCollection: Deleting all testing documents and collection...")
 	testCollectionID := os.Getenv("FIRESTORE_TEST_DATA_COLLECTION_ID")
 	ctx := _getTestContext()
 	db := _initDbConnection(ctx)
 	testCollection := db.Collection(testCollectionID)
-	err := _deleteCollection(ctx, db, testCollection, 32)
+	err := _deleteCollection(ctx, db, testCollection, 128)
 	if err != nil {
-		t.Fatal("[ERROR] DeleteTestingCollection: Failed at deleting test collection")
+		t.Fatalf(`[ERROR] DeleteTestingCollection: Failed at deleting test collection. Reason: %s`, err)
 	}
 	db.Close()
 }
