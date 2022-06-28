@@ -248,10 +248,10 @@ func TestEditTaskContent(t *testing.T) {
 	c := _getTestContext()
 	collectionID := os.Getenv("FIRESTORE_TEST_DATA_COLLECTION_ID")
 
-	taskWrapper, err := dbGetAllTasks(c, collectionID)
+	taskWrapper, _ := dbGetAllTasks(c, collectionID)
 	taskID := taskWrapper.Orders[1]
 	oldTask := taskWrapper.Data[taskID]
-	newContent := oldTask.Content + "EDITED VERSION"
+	newContent := oldTask.Content + "==EDITED VERSION"
 
 	payload := map[string]interface{}{"Content": newContent}
 
@@ -259,13 +259,13 @@ func TestEditTaskContent(t *testing.T) {
 	// edit one task:
 	// - param: collectionID, docID, newContent
 	// - return: updatedTask
-	task, err := dbEditTask(c, taskID, payload, collectionID)
+	_, err := dbEditTask(c, taskID, payload, collectionID)
 
 	if err != nil {
 		t.Fatalf(`[ERROR] TestEditTaskContent: Failed at uploading edited content. Reason: %s`, err)
 	}
 
-	updatedTaskWrapper, err := dbGetAllTasks(c, collectionID)
+	updatedTaskWrapper, _ := dbGetAllTasks(c, collectionID)
 
 	// check if content is updated
 	updatedTask := updatedTaskWrapper.Data[taskID]
