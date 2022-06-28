@@ -332,7 +332,7 @@ func TestEditTaskContent(t *testing.T) {
 	}
 }
 
-func TestInvalidEditTaskContent_FieldNotExists(t *testing.T) {
+func _TestInvalidEditTaskContent_FieldNotExists(t *testing.T) {
 	c := _getTestContext()
 
 	collectionID := os.Getenv("FIRESTORE_TEST_DATA_COLLECTION_ID")
@@ -346,6 +346,23 @@ func TestInvalidEditTaskContent_FieldNotExists(t *testing.T) {
 	if err == nil {
 		t.Fatalf(
 			`[ERROR] TestInvalidEditTaskContent_FieldNotExists: Can still edit task while it should not`,
+		)
+	}
+}
+
+func TestInvalidEditTaskContent_DocumentNotExists(t *testing.T) {
+	c := _getTestContext()
+
+	collectionID := os.Getenv("FIRESTORE_TEST_DATA_COLLECTION_ID")
+	taskID := "Non-existing taskID (document ID)"
+	payload := map[string]interface{}{"InvalidFields": "any value"}
+
+	test, err := dbEditTask(c, taskID, payload, collectionID)
+	log.Println(test)
+	log.Println(err)
+	if err == nil {
+		t.Fatalf(
+			`[ERROR] TestInvalidEditTaskContent_DocumentNotExists: Can still edit task while document is not exists`,
 		)
 	}
 }
