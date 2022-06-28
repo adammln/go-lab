@@ -252,15 +252,9 @@ func TestEditTaskContent(t *testing.T) {
 	taskID := taskWrapper.Orders[1]
 	oldTask := taskWrapper.Data[taskID]
 	newContent := oldTask.Content + "==EDITED VERSION"
-
 	payload := map[string]interface{}{"Content": newContent}
 
-	// randomly get one task, retrieve docID
-	// edit one task:
-	// - param: collectionID, docID, newContent
-	// - return: updatedTask
 	_, err := dbEditTask(c, taskID, payload, collectionID)
-
 	if err != nil {
 		t.Fatalf(`[ERROR] TestEditTaskContent: Failed at uploading edited content. Reason: %s`, err)
 	}
@@ -333,24 +327,15 @@ func TestEditTaskContent(t *testing.T) {
 
 func TestInvalidEditTaskContent_FieldNotExists(t *testing.T) {
 	c := _getTestContext()
-	collectionID := os.Getenv("FIRESTORE_TEST_DATA_COLLECTION_ID")
 
+	collectionID := os.Getenv("FIRESTORE_TEST_DATA_COLLECTION_ID")
 	taskWrapper, _ := dbGetAllTasks(c, collectionID)
 	taskID := taskWrapper.Orders[1]
-	oldTask := taskWrapper.Data[taskID]
-	newContent := oldTask.Content + "==EDITED VERSION"
+	payload := map[string]interface{}{"InvalidFields": "any value"}
 
-	payload := map[string]interface{}{"Content": newContent}
-
-	// randomly get one task, retrieve docID
-	// edit one task:
-	// - param: collectionID, docID, newContent
-	// - return: updatedTask
 	test, err := dbEditTask(c, taskID, payload, collectionID)
-
 	log.Println(test)
 	log.Println(err)
-
 	if err == nil {
 		t.Fatalf(
 			`[ERROR] TestInvalidEditTaskContent_FieldNotExists: Can still edit task while it should not`,
