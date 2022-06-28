@@ -36,7 +36,6 @@ func _initFirebaseApp(c *gin.Context) (*firebase.App, error) {
 	sa := option.WithCredentialsFile(os.Getenv("RELATIVE_PATH_GCP_KEYFILE"))
 	app, err := firebase.NewApp(c, nil, sa)
 	if err != nil {
-		log.Fatalln(err)
 		return nil, err
 	}
 	return app, err
@@ -45,7 +44,6 @@ func _initFirebaseApp(c *gin.Context) (*firebase.App, error) {
 func _initFirestoreClient(c *gin.Context, app *firebase.App) (*firestore.Client, error) {
 	db, err := app.Firestore(c)
 	if err != nil {
-		log.Fatalln(err)
 		return nil, err
 	}
 	return db, nil
@@ -62,7 +60,6 @@ func dbCreateTask(c *gin.Context, content string, rankOrder int, collectionID st
 	newTask := _generateNewTask(content, "", rankOrder)
 	wr, err := db.Collection(collectionID).Doc(newTask.ID).Set(c, newTask)
 	if err != nil {
-		log.Fatalf(`[Error] dbapi.dbGetAllTasks: Can't Create Task Document with content "%s". %s`, content, err)
 		db.Close()
 		return nil, err
 	}
@@ -86,14 +83,12 @@ func dbGetAllTasks(c *gin.Context, collectionID string) (*TaskWrapper, error) {
 		}
 
 		if err != nil {
-			log.Fatalln(err)
 			db.Close()
 			return nil, err
 		}
 
 		var task Task
 		if err := doc.DataTo(&task); err != nil {
-			log.Fatalf(`[Error] dbapi.dbGetAllTasks: Error while converting query data to Task model for doc ID: %s. %v`, doc.Ref.ID, err)
 			db.Close()
 			return nil, err
 		}
@@ -122,7 +117,6 @@ func dbEditTask(c *gin.Context, taskID string, payload map[string]interface{}, c
 
 	wr, err := db.Collection(collectionID).Doc(taskID).Update(c, updates)
 	if err != nil {
-		// log.Fatalln(err)
 		db.Close()
 		return nil, err
 	}

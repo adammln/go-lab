@@ -357,9 +357,7 @@ func TestInvalidEditTaskContent_DocumentNotExists(t *testing.T) {
 	taskID := "Non-existing taskID (document ID)"
 	payload := map[string]interface{}{"InvalidFields": "any value"}
 
-	test, err := dbEditTask(c, taskID, payload, collectionID)
-	log.Println(test)
-	log.Println(err)
+	_, err := dbEditTask(c, taskID, payload, collectionID)
 	if err == nil {
 		t.Fatalf(
 			`[ERROR] TestInvalidEditTaskContent_DocumentNotExists: Can still edit task while document is not exists`,
