@@ -253,11 +253,13 @@ func TestEditTaskContent(t *testing.T) {
 	oldTask := taskWrapper.Data[taskID]
 	newContent := oldTask.Content + "EDITED VERSION"
 
+	payload := map[string]interface{}{"Content": newContent}
+
 	// randomly get one task, retrieve docID
 	// edit one task:
 	// - param: collectionID, docID, newContent
 	// - return: updatedTask
-	task, err := dbEditTaskContent(c, taskID, newContent, collectionID)
+	task, err := dbEditTask(c, taskID, payload, collectionID)
 
 	if err != nil {
 		t.Fatalf(`[ERROR] TestEditTaskContent: Failed at uploading edited content. Reason: %s`, err)
