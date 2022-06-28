@@ -270,7 +270,11 @@ func TestEditTaskContent(t *testing.T) {
 	// check if content is updated
 	updatedTask := updatedTaskWrapper.Data[taskID]
 	if updatedTask.Content != newContent {
-		t.Fatalf(`[ERROR] TestEditTaskContent: Content is not updated on DB`)
+		t.Fatalf(
+			`[ERROR] TestEditTaskContent: Content is not updated on DB. updatedTask.Content = "%s", want "%s"`,
+			updatedTask.Content,
+			newContent,
+		)
 	}
 
 	// check if values of all other fields is not changed or not missing
@@ -374,7 +378,7 @@ func _deleteCollection(ctx *gin.Context, client *firestore.Client,
 
 // =================== DANGER ZONE ========================
 // make sure target collectionID is correct! ==> FIRESTORE_TEST_DATA_COLLECTION_ID
-func Test__DeleteTestingCollection(t *testing.T) {
+func _Test__DeleteTestingCollection(t *testing.T) {
 	log.Println("[INFO] dbapi_test._DeleteTestingCollection: Deleting all testing documents and collection...")
 	testCollectionID := os.Getenv("FIRESTORE_TEST_DATA_COLLECTION_ID")
 	ctx := _getTestContext()
