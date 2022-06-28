@@ -332,7 +332,7 @@ func TestEditTaskContent(t *testing.T) {
 	}
 }
 
-func _TestInvalidEditTaskContent_FieldNotExists(t *testing.T) {
+func TestInvalidEditTaskContent_FieldNotExists(t *testing.T) {
 	c := _getTestContext()
 
 	collectionID := os.Getenv("FIRESTORE_TEST_DATA_COLLECTION_ID")
@@ -340,9 +340,7 @@ func _TestInvalidEditTaskContent_FieldNotExists(t *testing.T) {
 	taskID := taskWrapper.Orders[1]
 	payload := map[string]interface{}{"InvalidFields": "any value"}
 
-	test, err := dbEditTask(c, taskID, payload, collectionID)
-	log.Println(test)
-	log.Println(err)
+	_, err := dbEditTask(c, taskID, payload, collectionID)
 	if err == nil {
 		t.Fatalf(
 			`[ERROR] TestInvalidEditTaskContent_FieldNotExists: Can still edit task while it should not`,
