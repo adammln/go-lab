@@ -102,7 +102,6 @@ func TestFirebaseConnectionWrapper(t *testing.T) {
 	db.Close()
 }
 
-// TODO: Create test for empty task list
 func TestGetAllTasksIsEmpty(t *testing.T) {
 	c := _getTestContext()
 	collectionID := os.Getenv("FIRESTORE_TEST_DATA_COLLECTION_ID")
@@ -243,6 +242,93 @@ func TestGetAllTasks(t *testing.T) {
 		}
 	}
 }
+
+// TODO: Create TestEditTaskContent
+func TestEditTaskContent(t *testing.T) {
+	c := _getTestContext()
+	collectionID := os.Getenv("FIRESTORE_TEST_DATA_COLLECTION_ID")
+
+	taskWrapper, err := dbGetAllTasks(c, collectionID)
+	taskID := taskWrapper.Orders[1]
+	oldTask := taskWrapper.Data[taskID]
+	newContent := oldTask.Content + "EDITED VERSION"
+
+	// randomly get one task, retrieve docID
+	// edit one task:
+	// - param: collectionID, docID, newContent
+	// - return: updatedTask
+	task, err := dbEditTaskContent(c, taskID, newContent, collectionID)
+
+	if err != nil {
+		t.Fatalf(`[ERROR] TestEditTaskContent: Failed at uploading edited content. Reason: %s`, err)
+	}
+
+	updatedTaskWrapper, err := dbGetAllTasks(c, collectionID)
+
+	// check if content is updated
+	updatedTask := updatedTaskWrapper.Data[taskID]
+	if updatedTask.Content != newContent {
+		t.Fatalf(`[ERROR] TestEditTaskContent: Content is not updated on DB`)
+	}
+
+	// check if values of all other fields is not changed or not missing
+	if updatedTask.ID != oldTask.ID {
+		t.Fatalf(
+			`[ERROR] TestEditTaskContent: ID is changed or missing, updatedTask.ID = "%s", want "%s".`,
+			updatedTask.ID,
+			oldTask.ID,
+		)
+	}
+
+	if updatedTask.ParentID != oldTask.ParentID {
+		t.Fatalf(
+			`[ERROR] TestEditTaskContent: ParentID is changed or missing, updatedTask.ID = "%s", want "%s".`,
+			updatedTask.ParentID,
+			oldTask.ParentID,
+		)
+	}
+
+	if updatedTask.IsChecked != oldTask.IsChecked {
+		t.Fatalf(
+			`[ERROR] TestEditTaskContent: IsChecked is changed or missing, updatedTask.IsChecked = "%t", want "%t".`,
+			updatedTask.IsChecked,
+			oldTask.IsChecked,
+		)
+	}
+
+	if updatedTask.RankOrder != oldTask.RankOrder {
+		t.Fatalf(
+			`[ERROR] TestEditTaskContent: RankOrder is changed or missing, updatedTask.RankOrder = "%d", want "%d".`,
+			updatedTask.RankOrder,
+			oldTask.RankOrder,
+		)
+	}
+
+	// check whether subtask is equal by length 8
+	if len(updatedTask.Subtasks) != len(oldTask.Subtasks) {
+		t.Fatalf(
+			`[ERROR] TestEditTaskContent: length Subtasks is not equal, len(updatedTask.Subtasks) = "%d", want "%d".`,
+			len(updatedTask.Subtasks),
+			len(oldTask.Subtasks),
+		)
+	}
+
+	for i, _ := range updatedTask.Subtasks {
+		if updatedTask.Subtasks[i] != oldTask.Subtasks[i] {
+			t.Fatalf(
+				`[ERROR] TestEditTaskContent: Subtasks is not equal, updatedTask.Subtasks[%d] = "%s", want "%s".`,
+				i,
+				updatedTask.Subtasks[i],
+				oldTask.Subtasks[i],
+			)
+		}
+	}
+}
+
+// TODO: Create TestCheckUncheckTask
+// TODO: Create TestDeleteSubTask --> delete - auto reoder subtasks (after deleted item)
+// TODO: Create TestDeleteParentTask --> delete - auto reoder parents (after deleted item)
+// TODO: Create TestAddSubtask
 
 // =================== DANGER ZONE ========================
 // make sure target collectionID is correct!
