@@ -114,7 +114,13 @@ func dbGetAllTasks(c *gin.Context, collectionID string) (*TaskWrapper, error) {
 
 func dbEditTask(c *gin.Context, taskID string, payload map[string]interface{}, collectionID string) (*firestore.WriteResult, error) {
 	db := _initDbConnection(c)
-	wr, err := db.Collection(collectionID).Doc(taskID).Set(c, payload, firestore.MergeAll) //WIP: fixing
+
+	var updates []firestore.Update
+	for k, v := range payload {
+		updates = append(updates, firestore.Update{Path: k, Value: v})
+	}
+
+	wr, err := db.Collection(collectionID).Doc(taskID).Update(c, updates) //WIP: fixing
 	if err != nil {
 		log.Fatalln(err)
 		db.Close()
