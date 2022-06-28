@@ -111,3 +111,15 @@ func dbGetAllTasks(c *gin.Context, collectionID string) (*TaskWrapper, error) {
 	taskWrapper := TaskWrapper{Data: tasksData, Orders: orders}
 	return &taskWrapper, nil
 }
+
+func dbEditTask(c *gin.Context, taskID string, payload map[string]interface{}, collectionID string) (*firestore.WriteResult, error) {
+	db := _initDbConnection(c)
+	wr, err := db.Collection(collectionID).Doc(taskID).Set(c, payload)
+	if err != nil {
+		log.Fatalln(err)
+		db.Close()
+		return nil, err
+	}
+	db.Close()
+	return wr, nil
+}
