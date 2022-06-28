@@ -390,7 +390,7 @@ func _deleteCollection(ctx *gin.Context, client *firestore.Client,
 
 // =================== DANGER ZONE ========================
 // make sure target collectionID is correct! ==> FIRESTORE_TEST_DATA_COLLECTION_ID
-func Test__DeleteTestingCollection(t *testing.T) {
+func _Test__DeleteTestingCollection(t *testing.T) {
 	log.Println("[INFO] dbapi_test._DeleteTestingCollection: Deleting all testing documents and collection...")
 	testCollectionID := os.Getenv("FIRESTORE_TEST_DATA_COLLECTION_ID")
 	ctx := _getTestContext()
