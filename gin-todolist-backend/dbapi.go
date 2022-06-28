@@ -120,7 +120,7 @@ func dbEditTask(c *gin.Context, taskID string, payload map[string]interface{}, c
 		updates = append(updates, firestore.Update{Path: k, Value: v})
 	}
 
-	wr, err := db.Collection(collectionID).Doc(taskID).Update(c, updates) //WIP: fixing
+	wr, err := db.Collection(collectionID).Doc(taskID).Update(c, updates, firestore.Exists)
 	if err != nil {
 		log.Fatalln(err)
 		db.Close()
