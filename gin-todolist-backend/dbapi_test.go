@@ -102,6 +102,13 @@ func TestFirebaseConnectionWrapper(t *testing.T) {
 	db.Close()
 }
 
+func Test__PreTestingDatabaseCleanup(t *testing.T) {
+	err := _CleanUpHelper()
+	if err != nil {
+		t.Fatalf(`[ERROR] Test__PostTestingDatabaseCleanup: Failed at deleting test collection. Reason: %s`, err)
+	}
+}
+
 func TestGetAllTasksIsEmpty(t *testing.T) {
 	c := _getTestContext()
 	collectionID := os.Getenv("FIRESTORE_TEST_DATA_COLLECTION_ID")
@@ -348,6 +355,13 @@ func TestInvalidEditTaskContent_FieldNotExists(t *testing.T) {
 // TODO: Create TestDeleteParentTask --> delete - auto reoder parents (after deleted item)
 // TODO: Create TestAddSubtask
 
+func Test__PostTestingDatabaseCleanup(t *testing.T) {
+	err := _CleanUpHelper()
+	if err != nil {
+		t.Fatalf(`[ERROR] Test__PostTestingDatabaseCleanup: Failed at deleting test collection. Reason: %s`, err)
+	}
+}
+
 // =================== DANGER ZONE ========================
 // make sure target collectionID is correct!
 func _deleteCollection(ctx *gin.Context, client *firestore.Client,
@@ -390,15 +404,17 @@ func _deleteCollection(ctx *gin.Context, client *firestore.Client,
 
 // =================== DANGER ZONE ========================
 // make sure target collectionID is correct! ==> FIRESTORE_TEST_DATA_COLLECTION_ID
-func _Test__DeleteTestingCollection(t *testing.T) {
-	log.Println("[INFO] dbapi_test._DeleteTestingCollection: Deleting all testing documents and collection...")
+func _CleanUpHelper() error {
+	log.Println("[INFO] dbapi_test._CleanUpHelper: Deleting all testing documents and collection...")
 	testCollectionID := os.Getenv("FIRESTORE_TEST_DATA_COLLECTION_ID")
 	ctx := _getTestContext()
 	db := _initDbConnection(ctx)
 	testCollection := db.Collection(testCollectionID)
 	err := _deleteCollection(ctx, db, testCollection, 128)
 	if err != nil {
-		t.Fatalf(`[ERROR] DeleteTestingCollection: Failed at deleting test collection. Reason: %s`, err)
+		db.Close()
+		return err
 	}
 	db.Close()
+	return nil
 }
