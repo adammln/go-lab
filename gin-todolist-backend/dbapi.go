@@ -122,7 +122,7 @@ func dbEditTask(c *gin.Context, taskID string, payload map[string]interface{}, c
 
 	wr, err := db.Collection(collectionID).Doc(taskID).Update(c, updates)
 	if err != nil {
-		log.Fatalln(err)
+		// log.Fatalln(err)
 		db.Close()
 		return nil, err
 	}
