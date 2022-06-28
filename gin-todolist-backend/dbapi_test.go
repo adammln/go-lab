@@ -331,6 +331,33 @@ func TestEditTaskContent(t *testing.T) {
 	}
 }
 
+func TestInvalidEditTaskContent_FieldNotExists(t *testing.T) {
+	c := _getTestContext()
+	collectionID := os.Getenv("FIRESTORE_TEST_DATA_COLLECTION_ID")
+
+	taskWrapper, _ := dbGetAllTasks(c, collectionID)
+	taskID := taskWrapper.Orders[1]
+	oldTask := taskWrapper.Data[taskID]
+	newContent := oldTask.Content + "==EDITED VERSION"
+
+	payload := map[string]interface{}{"Content": newContent}
+
+	// randomly get one task, retrieve docID
+	// edit one task:
+	// - param: collectionID, docID, newContent
+	// - return: updatedTask
+	test, err := dbEditTask(c, taskID, payload, collectionID)
+
+	log.Println(test)
+	log.Println(err)
+
+	if err == nil {
+		t.Fatalf(
+			`[ERROR] TestInvalidEditTaskContent_FieldNotExists: Can still edit task while it should not`,
+		)
+	}
+}
+
 // TODO: Create TestCheckUncheckTask
 // TODO: Create TestDeleteSubTask --> delete - auto reoder subtasks (after deleted item)
 // TODO: Create TestDeleteParentTask --> delete - auto reoder parents (after deleted item)
