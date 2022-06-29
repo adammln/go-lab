@@ -16,7 +16,7 @@ var validFields = map[string]interface{}{
 	"Subtasks":  []string{},
 }
 
-func FieldValidator(fieldName string, value interface{}) error {
+func TaskFieldValidator(fieldName string, value interface{}) error {
 	if typeInterface, isExists := validFields[fieldName]; !isExists {
 		return errors.New(
 			fmt.Sprintf(
