@@ -112,7 +112,7 @@ func dbEditTask(c *gin.Context, taskID string, payload map[string]interface{}, c
 
 	var updates []firestore.Update
 	for k, v := range payload {
-		err := FieldValidator(k, v)
+		err := TaskFieldValidator(k, v)
 		if err != nil {
 			db.Close()
 			return nil, err
